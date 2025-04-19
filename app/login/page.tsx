@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useLanguage } from "@/lib/i18n/language-context"
 import LanguageSelector from "@/components/language-selector"
 import { LogIn, AlertCircle } from "lucide-react"
+import { getSupabaseBrowserClient } from "@/lib/supabase/supabase-browser"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,6 +41,23 @@ export default function LoginPage() {
         setError(result.error || "Login failed. Please check your credentials and try again.")
         setLoading(false)
         return
+      }
+
+      // Check if the user needs to complete onboarding
+      if (result.data?.user) {
+        const supabase = getSupabaseBrowserClient()
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", result.data.user.id)
+          .single()
+
+        if (profileData && profileData.onboarding_completed === false) {
+          // Redirect to questionnaire/onboarding
+          console.log("User needs to complete onboarding, redirecting to initial setup")
+          router.push("/initial-setup")
+          return
+        }
       }
 
       // Redirect to dashboard on successful login
@@ -134,7 +152,7 @@ export default function LoginPage() {
                 ) : (
                   <span className="flex items-center">
                     <LogIn className="mr-2 h-4 w-4" />
-                    {t("login.signIn") || "Sign In"}
+                    {t("Login") || "Sign In"}
                   </span>
                 )}
               </Button>
@@ -143,16 +161,16 @@ export default function LoginPage() {
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-center w-full">
               <span className="text-sm text-gray-500">
-                {t("login.noAccount") || "Don't have an account?"}{" "}
+                {"Don't have an account?"}{" "}
                 <Link href="/signup" className="text-teal-600 hover:underline">
-                  {t("login.createAccount") || "Create one"}
+                  {"Create one"}
                 </Link>
               </span>
             </div>
             <div className="text-center w-full">
               <Link href="/dashboard?preview=true">
                 <Button variant="outline" className="w-full">
-                  {t("login.continueAsGuest") || "Continue as guest"}
+                  {"Continue as guest"}
                 </Button>
               </Link>
             </div>

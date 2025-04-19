@@ -146,100 +146,100 @@ export default function DashboardPage() {
     }
   }
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true)
-        setError("")
+  async function loadData() {
+    try {
+      setLoading(true)
+      setError("")
 
-        // Check authentication status first
-        const isUserAuthenticated = await checkAuthentication()
-        console.log("Authentication check result:", isUserAuthenticated)
+      // Check authentication status first
+      const isUserAuthenticated = await checkAuthentication()
+      console.log("Authentication check result:", isUserAuthenticated)
 
-        // Only fetch user profile if authenticated AND not in preview mode
-        if (isUserAuthenticated && !isPreview) {
-          try {
-            // First try to get the name directly from auth
-            const authName = await getUserNameFromAuth()
+      // Only fetch user profile if authenticated AND not in preview mode
+      if (isUserAuthenticated && !isPreview) {
+        try {
+          // First try to get the name directly from auth
+          const authName = await getUserNameFromAuth()
 
-            // Then try to get the full profile
-            const profileData = await getUserProfile()
-            console.log("Profile data loaded:", profileData)
+          // Then try to get the full profile
+          const profileData = await getUserProfile()
+          console.log("Profile data loaded:", profileData)
 
-            // Check if user needs to complete onboarding
-            if (!profileData.onboardingCompleted) {
-              console.log("User needs to complete onboarding")
-              setNeedsOnboarding(true)
-              router.push("/initial-setup")
-              return
-            }
+          // Check if user needs to complete onboarding
+          if (profileData && profileData.onboardingCompleted === false) {
+            console.log("User needs to complete onboarding")
+            setNeedsOnboarding(true)
+            router.push("/initial-setup")
+            return
+          }
 
-            // If we got a profile, use it
-            if (profileData && !profileData.isGuest) {
-              setProfile(profileData)
+          // If we got a profile, use it
+          if (profileData && !profileData.isGuest) {
+            setProfile(profileData)
 
-              // Extract user needs from profile data
-              const needs = extractUserNeeds(profileData)
-              setUserNeeds(needs)
-              console.log("User needs extracted:", needs)
+            // Extract user needs from profile data
+            const needs = extractUserNeeds(profileData)
+            setUserNeeds(needs)
+            console.log("User needs extracted:", needs)
 
-              // Use the user's preferred location if available
-              if (profileData.location) {
-                setSelectedLocation(profileData.location)
-                loadResourcesByLocation(profileData.location)
-              } else {
-                loadResourcesByLocation(initialLocation)
-              }
-            }
-            // If profile failed but we have auth name, create a minimal profile
-            else if (authName) {
-              setProfile({
-                name: authName,
-                isGuest: false,
-              })
+            // Use the user's preferred location if available
+            if (profileData.location) {
+              setSelectedLocation(profileData.location)
+              loadResourcesByLocation(profileData.location)
+            } else {
               loadResourcesByLocation(initialLocation)
             }
-            // Fallback to default
-            else {
-              const supabase = getSupabaseBrowserClient()
-              const { data } = await supabase.auth.getUser()
-
-              setProfile({
-                name: data?.user?.user_metadata?.name || "User",
-                isGuest: false,
-              })
-              loadResourcesByLocation(initialLocation)
-            }
-          } catch (profileError) {
-            console.error("Error fetching profile:", profileError)
-
-            // Try to get name directly from auth as fallback
-            const authName = await getUserNameFromAuth()
-
-            // Set a default profile if there's an error
+          }
+          // If profile failed but we have auth name, create a minimal profile
+          else if (authName) {
             setProfile({
-              name: authName || "User",
+              name: authName,
               isGuest: false,
             })
             loadResourcesByLocation(initialLocation)
           }
-        } else {
-          // Set a guest profile for non-authenticated users or preview mode
+          // Fallback to default
+          else {
+            const supabase = getSupabaseBrowserClient()
+            const { data } = await supabase.auth.getUser()
+
+            setProfile({
+              name: data?.user?.user_metadata?.name || "User",
+              isGuest: false,
+            })
+            loadResourcesByLocation(initialLocation)
+          }
+        } catch (profileError) {
+          console.error("Error fetching profile:", profileError)
+
+          // Try to get name directly from auth as fallback
+          const authName = await getUserNameFromAuth()
+
+          // Set a default profile if there's an error
           setProfile({
-            name: "Guest",
-            isGuest: true,
+            name: authName || "User",
+            isGuest: false,
           })
-          setUserNeeds(null)
           loadResourcesByLocation(initialLocation)
         }
-      } catch (error) {
-        console.error("Error loading dashboard data:", error)
-        setError("Failed to load resources. Please try refreshing the page.")
-      } finally {
-        setLoading(false)
+      } else {
+        // Set a guest profile for non-authenticated users or preview mode
+        setProfile({
+          name: "Guest",
+          isGuest: true,
+        })
+        setUserNeeds(null)
+        loadResourcesByLocation(initialLocation)
       }
+    } catch (error) {
+      console.error("Error loading dashboard data:", error)
+      setError("Failed to load resources. Please try refreshing the page.")
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     loadData()
 
     // Set up auth state listener to detect sign-outs

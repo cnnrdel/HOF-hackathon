@@ -4,40 +4,55 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { getSupabaseBrowserClient } from "@/lib/supabase-client"
 import OnboardingQuestionnaire from "@/components/onboarding-questionnaire"
-import { getUserProfile } from "@/lib/actions"
 
 export default function InitialSetupPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
+  const [userId, setUserId] = useState(null)
 
   useEffect(() => {
     async function checkAuthAndOnboarding() {
       try {
         setLoading(true)
 
-        // Check if user is authenticated
+        // Check authentication
         const supabase = getSupabaseBrowserClient()
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession()
 
-        if (sessionError || !sessionData.session) {
+        if (sessionError || !session) {
           console.log("No active session, redirecting to login")
           router.push("/login?redirect=/initial-setup")
           return
         }
 
         setIsAuthenticated(true)
+        setUserId(session.user.id)
+
+        console.log("User authenticated:", session.user.id)
+        console.log("User metadata:", session.user.user_metadata)
 
         // Check if user has already completed onboarding
         try {
-          const profileData = await getUserProfile()
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("onboarding_completed")
+            .eq("id", session.user.id)
+            .single()
 
-          if (profileData && profileData.onboardingCompleted) {
+          if (profileError) {
+            console.error("Error fetching profile:", profileError)
+            // Continue with onboarding if profile fetch fails
+          } else if (profileData && profileData.onboarding_completed) {
             console.log("User has already completed onboarding, redirecting to dashboard")
-            setHasCompletedOnboarding(true)
             router.push("/dashboard")
             return
+          } else {
+            console.log("User needs to complete onboarding")
           }
         } catch (profileError) {
           console.error("Error fetching profile:", profileError)
