@@ -15,7 +15,7 @@ import { resourcesData, availableLocations, bostonResources } from "@/lib/resour
 export default function ResourceDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [resource, setResource] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -144,7 +144,7 @@ export default function ResourceDetailPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <Button onClick={handleGoBack} variant="outline" className="mb-6">
-        <ArrowLeft className="mr-2 h-4 w-4" /> {t("resourceDetail.back") || "Back to Dashboard"}
+        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Resources
       </Button>
 
       <Card className="mb-8">
@@ -163,11 +163,9 @@ export default function ResourceDetailPage() {
                           : "bg-amber-500"
                   }
                 >
-                  {t(`preferences.${resource.category}`) || capitalizeFirstLetter(resource.category)}
+                  {capitalizeFirstLetter(resource.category)}
                 </Badge>
-                {resource.priority === "high" && (
-                  <Badge className="bg-red-500">{t("dashboard.highPriority") || "High Priority"}</Badge>
-                )}
+                {resource.priority === "high" && <Badge className="bg-red-500">High Priority</Badge>}
                 <Badge variant="outline" className="flex items-center gap-1">
                   <Navigation className="h-3 w-3" /> {getLocationName(resource.location)}
                 </Badge>
@@ -178,7 +176,7 @@ export default function ResourceDetailPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold mb-2">{t("resourceDetail.description") || "Description"}</h3>
+            <h3 className="text-lg font-semibold mb-2">Description</h3>
             <CardDescription className="text-base">{resource.description}</CardDescription>
           </div>
 
@@ -187,7 +185,7 @@ export default function ResourceDetailPage() {
               <div className="flex items-start gap-2">
                 <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
-                  <h4 className="font-medium">{t("resourceDetail.phone") || "Phone"}</h4>
+                  <h4 className="font-medium">Phone</h4>
                   <p className="text-lg font-semibold text-red-600">{resource.phone}</p>
                 </div>
               </div>
@@ -197,7 +195,7 @@ export default function ResourceDetailPage() {
               <div className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
-                  <h4 className="font-medium">{t("resourceDetail.address") || "Address"}</h4>
+                  <h4 className="font-medium">Address</h4>
                   <p>{resource.address}</p>
                 </div>
               </div>
@@ -207,7 +205,7 @@ export default function ResourceDetailPage() {
               <div className="flex items-start gap-2">
                 <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
-                  <h4 className="font-medium">{t("resourceDetail.hours") || "Hours"}</h4>
+                  <h4 className="font-medium">Hours</h4>
                   <p>{resource.hours}</p>
                 </div>
               </div>
@@ -217,7 +215,7 @@ export default function ResourceDetailPage() {
               <div className="flex items-start gap-2">
                 <Info className="h-5 w-5 text-gray-500 mt-0.5" />
                 <div>
-                  <h4 className="font-medium">{t("resourceDetail.eligibility") || "Eligibility"}</h4>
+                  <h4 className="font-medium">Eligibility</h4>
                   <p>{resource.eligibility}</p>
                 </div>
               </div>
@@ -226,32 +224,29 @@ export default function ResourceDetailPage() {
 
           {resource.details && (
             <div>
-              <h3 className="text-lg font-semibold mb-2">
-                {t("resourceDetail.additionalInfo") || "Additional Information"}
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
               <p>{resource.details}</p>
             </div>
           )}
 
           <Alert className="bg-blue-50 border-blue-200">
             <Info className="h-4 w-4 text-blue-500" />
-            <AlertTitle className="text-blue-700">{t("resourceDetail.disclaimer") || "Disclaimer"}</AlertTitle>
+            <AlertTitle className="text-blue-700">Disclaimer</AlertTitle>
             <AlertDescription className="text-blue-600">
-              {t("resourceDetail.disclaimerText") ||
-                "Information may change without notice. Please contact the organization directly to confirm details."}
+              Information may change without notice. Please contact the organization directly to confirm details.
             </AlertDescription>
           </Alert>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row gap-4">
           <Link href={resource.link} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
             <Button className="w-full bg-teal-600 hover:bg-teal-700">
-              {t("resourceDetail.visitWebsite") || "Visit Website"} <ExternalLink className="ml-2 h-4 w-4" />
+              Visit Website <ExternalLink className="ml-2 h-4 w-4" />
             </Button>
           </Link>
           {resource.phone && (
             <a href={`tel:${resource.phone.replace(/[^0-9]/g, "")}`} className="w-full sm:w-auto">
               <Button variant="outline" className="w-full">
-                {t("resourceDetail.call") || "Call"} <Phone className="ml-2 h-4 w-4" />
+                Call <Phone className="ml-2 h-4 w-4" />
               </Button>
             </a>
           )}
@@ -260,7 +255,7 @@ export default function ResourceDetailPage() {
 
       {relatedResources.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">{t("resourceDetail.relatedResources") || "Related Resources"}</h2>
+          <h2 className="text-xl font-bold mb-4">Related Resources</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedResources.map((related) => (
               <RelatedResourceCard key={related.id} resource={related} category={resource.category} />
@@ -273,8 +268,6 @@ export default function ResourceDetailPage() {
 }
 
 function RelatedResourceCard({ resource, category }) {
-  const { t } = useLanguage()
-
   // Get location name from location ID
   const getLocationName = (locationId) => {
     const locationObj = availableLocations.find((loc) => loc.id === locationId)
@@ -298,7 +291,7 @@ function RelatedResourceCard({ resource, category }) {
       <CardFooter>
         <Link href={`/resources/${resource.id}`} className="w-full">
           <Button variant="outline" className="w-full">
-            {t("resourceDetail.viewDetails") || "View Details"}
+            View Details
           </Button>
         </Link>
       </CardFooter>
