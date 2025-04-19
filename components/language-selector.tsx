@@ -49,7 +49,7 @@ export default function LanguageSelector({
           size={size}
           className={`gap-2 font-medium transition-all duration-300 ease-in-out ${
             variant === "outline"
-              ? "border-2 bg-white/20 text-white hover:border-teal-300 hover:text-teal-100 hover:scale-105"
+              ? "border-2 bg-white/20 text-gray hover:border-gray-300 hover:text-gray-100 hover:scale-105"
               : "bg-teal-600 hover:bg-teal-500 hover:scale-105"
           } ${className}`}
           onMouseEnter={() => setIsHovered(true)}

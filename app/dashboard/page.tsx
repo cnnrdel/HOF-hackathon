@@ -306,8 +306,8 @@ export default function DashboardPage() {
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link href="/">
-              <h1 className="text-2xl font-bold text-teal-600">CareCompass</h1>
+            <Link href="/" className="flex items-center">
+              <img src="/images/logo.png" alt="CareCompass Logo" className="h-10" />
             </Link>
 
             {/* Mobile menu button */}
@@ -532,6 +532,7 @@ export default function DashboardPage() {
                       resource={resource}
                       userNeeds={userNeeds}
                       isAuthenticated={isAuthenticated}
+                      isPreview={isPreview}
                     />
                   ))}
                 </div>
@@ -546,6 +547,7 @@ export default function DashboardPage() {
                   resource={resource}
                   userNeeds={userNeeds}
                   isAuthenticated={isAuthenticated}
+                  isPreview={isPreview}
                 />
               ))}
             </div>
@@ -558,6 +560,7 @@ export default function DashboardPage() {
                   resource={resource}
                   userNeeds={userNeeds}
                   isAuthenticated={isAuthenticated}
+                  isPreview={isPreview}
                 />
               ))}
             </div>
@@ -570,6 +573,7 @@ export default function DashboardPage() {
                   resource={resource}
                   userNeeds={userNeeds}
                   isAuthenticated={isAuthenticated}
+                  isPreview={isPreview}
                 />
               ))}
             </div>
@@ -583,6 +587,7 @@ export default function DashboardPage() {
                   resource={resource}
                   userNeeds={userNeeds}
                   isAuthenticated={isAuthenticated}
+                  isPreview={isPreview}
                 />
               ))}
             </div>
@@ -596,6 +601,7 @@ export default function DashboardPage() {
                   resource={resource}
                   userNeeds={userNeeds}
                   isAuthenticated={isAuthenticated}
+                  isPreview={isPreview}
                 />
               ))}
             </div>
@@ -609,6 +615,7 @@ export default function DashboardPage() {
                   resource={resource}
                   userNeeds={userNeeds}
                   isAuthenticated={isAuthenticated}
+                  isPreview={isPreview}
                 />
               ))}
             </div>
@@ -622,6 +629,7 @@ export default function DashboardPage() {
                   resource={resource}
                   userNeeds={userNeeds}
                   isAuthenticated={isAuthenticated}
+                  isPreview={isPreview}
                 />
               ))}
             </div>
@@ -640,13 +648,16 @@ export default function DashboardPage() {
 }
 
 // Updated ResourceCard to include dynamic priority based on user needs
-function ResourceCard({ resource, userNeeds, isAuthenticated }) {
+function ResourceCard({ resource, userNeeds, isAuthenticated, isPreview }) {
   const { t } = useLanguage()
   const { id, title, description, type, link, phone, priority, location } = resource
 
-  // Determine if this resource should be high priority based on user needs
-  const isHighPriority =
-    isAuthenticated && userNeeds ? isResourceHighPriority(resource, userNeeds) : priority === "high"
+  // Determine if this resource should be high priority based on user needs and preview mode
+  const isHighPriority = isPreview
+    ? false
+    : isAuthenticated && userNeeds
+      ? isResourceHighPriority(resource, userNeeds)
+      : priority === "high"
 
   // Get location name from location ID
   const getLocationName = (locationId) => {
@@ -676,10 +687,10 @@ function ResourceCard({ resource, userNeeds, isAuthenticated }) {
     return null
   }
 
-  // Add a special class for high priority resources
+  // Add a special class for high priority resources, but not in preview mode
   const cardClass = isHighPriority
     ? `${type === "emergency" ? "border-l-4 border-red-500" : ""} ring-2 ring-red-200`
-    : `${type === "emergency" ? "border-l-4 border-red-500" : ""}`
+    : `${type === "emergency" && !isPreview ? "border-l-4 border-red-500" : ""}`
 
   return (
     <Card className={cardClass}>

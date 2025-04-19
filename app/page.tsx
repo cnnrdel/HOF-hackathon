@@ -19,19 +19,23 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <header className="bg-gradient-to-r from-teal-600 to-blue-500 text-white">
+      {/*<header className="bg-gradient-to-r from-teal-600 to-blue-500 text-white">*/}
+      <header className=" text-teal">
         <div className="container mx-auto px-4 py-12 md:py-20">
           <div className="flex justify-between mb-4">
             <div>
               <Link href="/login">
-                <Button variant="ghost" className="text-white hover:bg-white/20">
-                  {t("login.signIn") || "Sign In"}
+                <Button variant="ghost" className="text-gray-600 hover:bg-white/20">
+                  {t("Login") || "Sign In"}
                 </Button>
               </Link>
             </div>
             <LanguageSelector variant="outline" />
           </div>
           <div className="max-w-3xl mx-auto text-center">
+            <div className="flex justify-center mb-6">
+              <img src="/images/logo.png" alt="CareCompass Logo" className="h-20" />
+            </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               {t("hero.title") || "Find Housing & Healthcare Resources"}
             </h1>
@@ -49,8 +53,8 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-white text-white hover:bg-white/10 w-full sm:w-auto 
-                    transition-all duration-300 ease-in-out hover:border-yellow-300 hover:text-yellow-300 
+                  className="border-2 bg-none w-full sm:w-auto 
+                    transition-all duration-300 ease-in-out border-yellow-300 text-yellow-300 
                     hover:scale-105 font-medium text-lg shadow-lg z-10"
                   onMouseEnter={() => setBrowseHovered(true)}
                   onMouseLeave={() => setBrowseHovered(false)}
@@ -65,33 +69,6 @@ export default function HomePage() {
           </div>
         </div>
       </header>
-
-      {/* Main Categories Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{t("features.title") || "Essential Resources"}</h2>
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <ResourceCard
-              icon={<Home className="h-12 w-12 text-teal-500" />}
-              title={t("preferences.housing") || "Housing Assistance"}
-              description={
-                t("preferences.housing.description") ||
-                "Find emergency shelters, affordable housing options, rental assistance programs, and housing rights information."
-              }
-              link="/dashboard?preview=true&category=housing"
-            />
-            <ResourceCard
-              icon={<Heart className="h-12 w-12 text-teal-500" />}
-              title={t("preferences.healthcare") || "Healthcare Services"}
-              description={
-                t("preferences.healthcare.description") ||
-                "Access information about free clinics, insurance assistance, mental health services, and family healthcare."
-              }
-              link="/dashboard?preview=true&category=healthcare"
-            />
-          </div>
-        </div>
-      </section>
 
       {/* Search Section */}
       <section className="py-16 bg-gray-50">

@@ -56,8 +56,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
-          <Link href="/" className="text-2xl font-bold text-teal-600">
-            CareCompass
+          <Link href="/" className="flex items-center">
+            <img src="/images/logo.png" alt="CareCompass Logo" className="h-10" />
           </Link>
           <LanguageSelector />
         </div>
